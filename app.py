@@ -33,5 +33,27 @@ def create_diet():
     db.session.commit()
     return jsonify({'message': 'Diet created successfully!'}), 201
 
+@app.route('/read', methods=['GET'])
+def read_all_diets():
+    diets = Diet.query.all()
+    return jsonify([
+        {
+            "name": diet.name, 
+            "description": diet.description, 
+            "date": diet.date, 
+            "inside_diet": diet.inside_diet
+        }
+
+        for diet in diets
+    ])
+
+
+@app.route('/read/<int:id_diet>', methods=['GET'])
+def read_diet(id_diet):
+    diet = Diet.query.get(id_diet)
+    if diet:
+        return {"name": diet.name, "description": diet.description, "date": diet.date, "inside_diet": diet.inside_diet}
+    return jsonify({'error': 'Diet not found'}), 404
+
 if __name__ == '__main__':
     app.run(debug=True)
