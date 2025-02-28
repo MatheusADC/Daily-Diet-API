@@ -21,7 +21,7 @@ def create_diet():
         date_str = data.get('date')
         date_obj = datetime.fromisoformat(date_str.replace("Z", ""))
     except ValueError:
-        return jsonify({'error': 'Invalid date format. Use ISO 8601 format (YYYY-MM-DDTHH:MM:SS)'}), 400
+        return jsonify({'message': 'Invalid date format. Use ISO 8601 format (YYYY-MM-DDTHH:MM:SS)'}), 400
 
     new_diet = Diet(
         name=data.get('name'),
@@ -43,7 +43,7 @@ def read_all_diets():
             "date": diet.date, 
             "inside_diet": diet.inside_diet
         }
-
+        
         for diet in diets
     ])
 
@@ -53,7 +53,20 @@ def read_diet(id_diet):
     diet = Diet.query.get(id_diet)
     if diet:
         return {"name": diet.name, "description": diet.description, "date": diet.date, "inside_diet": diet.inside_diet}
-    return jsonify({'error': 'Diet not found'}), 404
+    return jsonify({'message': 'Diet not found'}), 404
+
+@app.route('/update/<int:id_diet>', methods=['PUT'])
+def update_diet(id_diet):
+    data = request.get_json()
+    diet = Diet.query.get(id_diet)
+    if diet:
+        diet.name = data.get('name', diet.name)
+        diet.description = data.get('description', diet.description)
+        diet.date = data.get('date', diet.date)
+        diet.inside_diet = data.get('inside_diet', diet.inside_diet)
+        db.session.commit()
+        return jsonify({'message': f'Diet {id_diet} was updated successfully!'})
+    return jsonify({'message': 'Diet not found'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
