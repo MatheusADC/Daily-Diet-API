@@ -68,5 +68,14 @@ def update_diet(id_diet):
         return jsonify({'message': f'Diet {id_diet} was updated successfully!'})
     return jsonify({'message': 'Diet not found'}), 404
 
+@app.route('/delete/<int:id_diet>', methods=['DELETE'])
+def delete_diet(id_diet):
+    diet = Diet.query.get(id_diet)
+    if diet:
+        db.session.delete(diet)
+        db.session.commit()
+        return jsonify({'message': f'Diet {id_diet} was deleted successfully!'})
+    return jsonify({'message': 'Diet not found'}), 404
+
 if __name__ == '__main__':
     app.run(debug=True)
